@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space War: Galactic Legends</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="game.js" defer></script>
+</head>
+<body>
+    <h1>Space War: Galactic Legends</h1>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <audio id="backgroundMusic" src="music/background.mp3" loop></audio>
+    <script>
+        function initializeGame() {
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+            // Game logic to initialize levels and enemies
+            // TODO: Implement game logic here
+        }
+        window.onload = () => {
+            document.getElementById('backgroundMusic').play();
+            initializeGame();
+        };
+    </script>
+
+    <script>
+        // Levels
+        const levels = [
+            { name: 'Level 1', enemies: ['enemy1', 'enemy2'], boss: 'boss1' },
+            { name: 'Level 2', enemies: ['enemy3', 'enemy4'], boss: 'boss2' },
+            { name: 'Level 3', enemies: ['enemy5', 'enemy6'], boss: 'finalBoss' }
+        ];
+
+        // TODO: Add multiplayer support for 2 players
+    </script>
+</body>
+</html>
