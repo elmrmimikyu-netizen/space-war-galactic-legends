@@ -3,36 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Space War: Galactic Legends</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="game.js" defer></script>
+    <title>Space War</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+    </style>
 </head>
 <body>
-    <h1>Space War: Galactic Legends</h1>
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
-    <audio id="backgroundMusic" src="music/background.mp3" loop></audio>
+    <canvas id="gameCanvas"></canvas>
     <script>
-        function initializeGame() {
-            const canvas = document.getElementById('gameCanvas');
-            const ctx = canvas.getContext('2d');
-            // Game logic to initialize levels and enemies
-            // TODO: Implement game logic here
-        }
-        window.onload = () => {
-            document.getElementById('backgroundMusic').play();
-            initializeGame();
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        let player1, player2;
+        let bullets = [];
+        let enemies = [];
+        let boss = null;
+        let level = 0;
+        const soundEffects = {
+            shoot: new Audio('shoot.wav'),
+            explosion: new Audio('explosion.wav'),
+            background: new Audio('background.mp3')
         };
-    </script>
-
-    <script>
-        // Levels
-        const levels = [
-            { name: 'Level 1', enemies: ['enemy1', 'enemy2'], boss: 'boss1' },
-            { name: 'Level 2', enemies: ['enemy3', 'enemy4'], boss: 'boss2' },
-            { name: 'Level 3', enemies: ['enemy5', 'enemy6'], boss: 'finalBoss' }
-        ];
-
-        // TODO: Add multiplayer support for 2 players
+        
+        // Player class
+        class Player {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.width = 30;
+                this.height = 30;
+                this.color = color;
+                this.score = 0;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+            }
+            move(dir) {
+                if (dir === 'left' && this.x > 0) this.x -= 5;
+                if (dir === 'right' && this.x < canvas.width - this.width) this.x += 5;
+            }
+        }
+        
+        // Bullet class
+        class Bullet {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = 5;
+                this.speed = -5;
+            }
+            draw() {
+                ctx.fillStyle = 'yellow';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            update() {
+                this.y += this.speed;
+            }
+        }
+        
+        // Enemy class
+        class Enemy {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.width = 50;
+                this.height = 50;
+                this.health = 2;
+            }
+            draw() {
+                ctx.fillStyle = 'red';
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+            }
+            update() {
+                this.y += 1;
+                if (this.y > canvas.height) {
+                    // Handle enemy reaching bottom
+                }
+            }
+        }
+        
+        // Initialize players
+        function init() {
+            player1 = new Player(canvas.width / 4, canvas.height - 60, 'blue');
+            player2 = new Player(canvas.width * 3 / 4, canvas.height - 60, 'green');
+            soundEffects.background.loop = true;
+            soundEffects.background.play();
+            spawnEnemies();
+        }
+        
+        // Spawn enemies based on level
+        function spawnEnemies() {
+            for (let i = 0; i < 5 + level * 2; i++) {
+                const x = Math.random() * (canvas.width - 50);
+                enemies.push(new Enemy(x, -50));
+            }
+        }
+        
+        // Update game logic
+        function update() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            player1.draw();
+            player2.draw();
+            bullets.forEach((bullet, index) => {
+                bullet.update();
+                bullet.draw();
+                if (bullet.y < 0) {
+                    bullets.splice(index, 1);
+                }
+            });
+            enemies.forEach((enemy, index) => {
+                enemy.update();
+                enemy.draw();
+                if (enemy.y > canvas.height) {
+                    enemies.splice(index, 1);
+                }
+            });
+            requestAnimationFrame(update);
+        }
+        
+        // Handle key events
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'a') player1.move('left');
+            if (e.key === 'd') player1.move('right');
+            if (e.key === 'ArrowLeft') player2.move('left');
+            if (e.key === 'ArrowRight') player2.move('right');
+            if (e.key === ' ') {
+                bullets.push(new Bullet(player1.x + 15, player1.y));
+                soundEffects.shoot.play();
+            }
+        });
+        
+        init();
+        update();
     </script>
 </body>
 </html>
